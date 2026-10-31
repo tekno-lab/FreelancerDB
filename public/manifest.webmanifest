@@ -1,0 +1,19 @@
+{
+  "name": "Tekno Labs Freelance Suite",
+  "short_name": "Tekno Labs",
+  "description": "Mobile Freelance Tracker for Renewals, Manager.io Databases, Calendar Sync, and Quotes",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0f172a",
+  "theme_color": "#0284c7",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
