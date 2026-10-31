@@ -14,12 +14,12 @@
   function getTypeStyle(type) {
     switch (type) {
       case 'Database':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
       case 'QR Code':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
+        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
       case 'Website':
       default:
-        return 'bg-sky-500/10 text-sky-400 border-sky-500/20';
+        return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
     }
   }
 
@@ -36,14 +36,14 @@
   }
 </script>
 
-<div class="bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-4 shadow-sm transition-all relative overflow-hidden">
+<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-all relative overflow-hidden">
   <!-- Top Row: Client & Status Countdown -->
   <div class="flex items-start justify-between gap-2 mb-2">
     <div>
       <div class="flex items-center space-x-1.5">
-        <h3 class="text-base font-bold text-white tracking-tight">{renewal.client}</h3>
+        <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">{renewal.client}</h3>
       </div>
-      <div class="text-xs text-sky-400 font-medium truncate max-w-[210px] mt-0.5">
+      <div class="text-xs text-sky-600 dark:text-sky-400 font-medium truncate max-w-[210px] mt-0.5">
         {renewal.item}
       </div>
     </div>
@@ -66,12 +66,12 @@
     </span>
 
     <!-- Cycle -->
-    <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/60">
+    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
       {renewal.cycle || 'Annual'}
     </span>
 
     <!-- Expiry Date -->
-    <span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700/60 flex items-center space-x-1">
+    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 flex items-center space-x-1">
       <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
@@ -80,7 +80,7 @@
 
     <!-- Calendar Sync Icon -->
     {#if renewal.calendarEventId}
-      <span class="px-1.5 py-0.5 rounded bg-sky-950/60 text-sky-400 border border-sky-800/40 text-[10px] flex items-center space-x-1" title="Synced with Google Calendar (7d reminder)">
+      <span class="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[10px] flex items-center space-x-1" title="Synced with Google Calendar (7d reminder)">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
@@ -90,19 +90,19 @@
   </div>
 
   <!-- Financials Row -->
-  <div class="flex items-center justify-between pt-2.5 mt-2 border-t border-slate-800/80 text-xs">
+  <div class="flex items-center justify-between pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
     <div class="flex items-center space-x-3">
       <div>
-        <span class="text-slate-400 block text-[10px]">Price Charged</span>
-        <span class="font-bold text-white text-sm">{formatMoney(renewal.price, $config.currency)}</span>
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Price Charged</span>
+        <span class="font-bold text-slate-900 dark:text-white text-sm">{formatMoney(renewal.price, $config.currency)}</span>
       </div>
-      <div class="border-l border-slate-800 pl-3">
-        <span class="text-slate-400 block text-[10px]">Cost</span>
-        <span class="text-slate-300 font-medium">{formatMoney(renewal.cost, $config.currency)}</span>
+      <div class="border-l border-slate-200 dark:border-slate-800 pl-3">
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Cost</span>
+        <span class="text-slate-600 dark:text-slate-300 font-medium">{formatMoney(renewal.cost, $config.currency)}</span>
       </div>
-      <div class="border-l border-slate-800 pl-3">
-        <span class="text-slate-400 block text-[10px]">Profit</span>
-        <span class="text-emerald-400 font-semibold">+{formatMoney(profit, $config.currency)}</span>
+      <div class="border-l border-slate-200 dark:border-slate-800 pl-3">
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Profit</span>
+        <span class="text-emerald-600 dark:text-emerald-400 font-semibold">+{formatMoney(profit, $config.currency)}</span>
       </div>
     </div>
 
@@ -111,7 +111,7 @@
       <button
         on:click={() => { triggerHaptic(); onRenew(renewal); }}
         title="Renew (+1 Year)"
-        class="touch-press px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold"
+        class="touch-press px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold"
       >
         Renew
       </button>
@@ -119,7 +119,7 @@
       <button
         on:click={() => { triggerHaptic(); onEdit(renewal); }}
         title="Edit Renewal"
-        class="touch-press p-1.5 rounded-lg bg-slate-800 text-slate-300 hover:text-white border border-slate-700/60"
+        class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -129,7 +129,7 @@
       <button
         on:click={() => { triggerHaptic(); onDelete(renewal); }}
         title="Delete Renewal"
-        class="touch-press p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-red-400 border border-slate-700/60"
+        class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-500 dark:hover:text-red-400 border border-slate-200 dark:border-slate-700/60"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -139,7 +139,7 @@
   </div>
 
   {#if renewal.notes}
-    <div class="mt-2 text-[11px] text-slate-400 bg-slate-950/60 rounded-lg p-2 border border-slate-800/40 line-clamp-2">
+    <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/60 rounded-lg p-2 border border-slate-200 dark:border-slate-800/40 line-clamp-2">
       {renewal.notes}
     </div>
   {/if}

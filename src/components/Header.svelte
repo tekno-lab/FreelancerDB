@@ -16,7 +16,7 @@
   }
 </script>
 
-<header class="sticky top-0 z-40 w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 pt-safe px-4 pb-3">
+<header class="sticky top-0 z-40 w-full bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 pt-safe px-4 pb-3 transition-colors">
   <div class="flex items-center justify-between">
     <!-- Brand Info -->
     <div class="flex items-center space-x-2.5">
@@ -36,10 +36,10 @@
 
       <div>
         <div class="flex items-center space-x-1.5">
-          <span class="text-base font-bold tracking-tight text-white">Tekno Labs</span>
-          <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20">SUITE</span>
+          <span class="text-base font-bold tracking-tight text-slate-900 dark:text-white">Tekno Labs</span>
+          <span class="text-[10px] px-1.5 py-0.5 rounded font-semibold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">SUITE</span>
         </div>
-        <div class="flex items-center space-x-1 text-[11px] text-slate-400">
+        <div class="flex items-center space-x-1 text-[11px] text-slate-500 dark:text-slate-400">
           <span class="inline-block w-1.5 h-1.5 rounded-full {$isOnline ? 'bg-emerald-400' : 'bg-amber-400'}"></span>
           <span>{$isOnline ? ($config.webAppUrl ? 'Live Sheet' : 'Local Mode') : 'Offline'}</span>
         </div>
@@ -53,9 +53,9 @@
         on:click={handleSync}
         disabled={$isLoading}
         title="Sync with Google Sheets"
-        class="touch-press p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700/80 border border-slate-700/60 disabled:opacity-50"
+        class="touch-press p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60 disabled:opacity-50"
       >
-        <svg class="w-5 h-5 {$isLoading ? 'animate-spin text-sky-400' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg class="w-5 h-5 {$isLoading ? 'animate-spin text-sky-500' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
         </svg>
       </button>
@@ -64,7 +64,7 @@
       <button
         on:click={handleBell}
         title="View Alerts"
-        class="touch-press relative p-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700/80 border border-slate-700/60"
+        class="touch-press relative p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />

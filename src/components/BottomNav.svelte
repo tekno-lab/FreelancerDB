@@ -8,12 +8,12 @@
   }
 </script>
 
-<nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800/80 pb-safe">
+<nav class="fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-lg border-t border-slate-200 dark:border-slate-800/80 pb-safe transition-colors">
   <div class="max-w-md mx-auto grid grid-cols-5 h-16 items-center px-1">
     <!-- Renewals -->
     <button
       on:click={() => setTab('renewals')}
-      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'renewals' ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}"
+      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'renewals' ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}"
     >
       <div class="relative p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -26,7 +26,7 @@
     <!-- Quotes -->
     <button
       on:click={() => setTab('quotes')}
-      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'quotes' ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}"
+      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'quotes' ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}"
     >
       <div class="p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -39,7 +39,7 @@
     <!-- Services -->
     <button
       on:click={() => setTab('services')}
-      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'services' ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}"
+      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'services' ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}"
     >
       <div class="p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,14 +52,14 @@
     <!-- Alerts -->
     <button
       on:click={() => setTab('alerts')}
-      class="flex flex-col items-center justify-center h-full touch-press transition-colors relative {$activeTab === 'alerts' ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}"
+      class="flex flex-col items-center justify-center h-full touch-press transition-colors relative {$activeTab === 'alerts' ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}"
     >
       <div class="relative p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
         {#if $alertCount > 0}
-          <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 ring-2 ring-slate-900"></span>
+          <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-slate-900"></span>
         {/if}
       </div>
       <span class="text-[10px] mt-0.5">Alerts</span>
@@ -68,7 +68,7 @@
     <!-- Settings -->
     <button
       on:click={() => setTab('settings')}
-      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'settings' ? 'text-sky-400 font-semibold' : 'text-slate-400 hover:text-slate-200'}"
+      class="flex flex-col items-center justify-center h-full touch-press transition-colors {$activeTab === 'settings' ? 'text-sky-600 dark:text-sky-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}"
     >
       <div class="p-1">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
