@@ -1,5 +1,6 @@
 <script>
   import { config } from '../lib/stores.js';
+  import { lang, t } from '../lib/i18n.js';
   import { daysUntil, formatDate, formatMoney, getUrgency, triggerHaptic } from '../lib/utils.js';
 
   export let renewal;
@@ -8,7 +9,13 @@
   export let onRenew = () => {};
 
   $: daysLeft = daysUntil(renewal.expiryDate);
-  $: urgency = getUrgency(daysLeft);
+  $: rawUrgency = getUrgency(daysLeft);
+  $: urgency = {
+    ...rawUrgency,
+    label: $lang === 'ku'
+      ? (daysLeft < 0 ? `${Math.abs(daysLeft)} ڕۆژ بەسەرچووە` : daysLeft === 0 ? 'ئەمڕۆ بەسەردەچێت!' : `${daysLeft} ڕۆژی ماوە`)
+      : rawUrgency.label
+  };
   $: profit = (Number(renewal.price) || 0) - (Number(renewal.cost) || 0);
 
   function getTypeStyle(type) {
@@ -21,6 +28,15 @@
       default:
         return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
     }
+  }
+
+  function getTypeLabel(type) {
+    if ($lang === 'ku') {
+      if (type === 'Database') return 'داتابەیس';
+      if (type === 'QR Code') return 'کۆدی QR';
+      if (type === 'Website') return 'وێبسایت';
+    }
+    return type;
   }
 
   function getTypeIcon(type) {
@@ -40,7 +56,7 @@
   <!-- Top Row: Client & Status Countdown -->
   <div class="flex items-start justify-between gap-2 mb-2">
     <div>
-      <div class="flex items-center space-x-1.5">
+      <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
         <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">{renewal.client}</h3>
       </div>
       <div class="text-xs text-sky-600 dark:text-sky-400 font-medium truncate max-w-[210px] mt-0.5">
@@ -49,7 +65,7 @@
     </div>
 
     <!-- Urgency Badge -->
-    <div class="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border {urgency.badgeClass}">
+    <div class="inline-flex items-center space-x-1.5 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-semibold border {urgency.badgeClass}">
       <span class="w-1.5 h-1.5 rounded-full {urgency.dotClass}"></span>
       <span>{urgency.label}</span>
     </div>
@@ -58,11 +74,11 @@
   <!-- Middle Row: Type & Expiry Info -->
   <div class="flex flex-wrap items-center gap-1.5 text-xs my-2.5">
     <!-- Type Badge -->
-    <span class="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md font-medium border {getTypeStyle(renewal.type)}">
+    <span class="inline-flex items-center space-x-1 rtl:space-x-reverse px-2 py-0.5 rounded-md font-medium border {getTypeStyle(renewal.type)}">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getTypeIcon(renewal.type)} />
       </svg>
-      <span>{renewal.type}</span>
+      <span>{getTypeLabel(renewal.type)}</span>
     </span>
 
     <!-- Cycle -->
@@ -71,7 +87,7 @@
     </span>
 
     <!-- Expiry Date -->
-    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 flex items-center space-x-1">
+    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 flex items-center space-x-1 rtl:space-x-reverse">
       <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
@@ -80,45 +96,45 @@
 
     <!-- Calendar Sync Icon -->
     {#if renewal.calendarEventId}
-      <span class="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[10px] flex items-center space-x-1" title="Synced with Google Calendar (7d reminder)">
+      <span class="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[10px] flex items-center space-x-1 rtl:space-x-reverse" title="Synced with Google Calendar (7d reminder)">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        <span>GCal 7d</span>
+        <span>{t('card_gcal_synced', $lang)}</span>
       </span>
     {/if}
   </div>
 
   <!-- Financials Row -->
   <div class="flex items-center justify-between pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-    <div class="flex items-center space-x-3">
+    <div class="flex items-center space-x-3 rtl:space-x-reverse">
       <div>
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Price Charged</span>
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_price', $lang)}</span>
         <span class="font-bold text-slate-900 dark:text-white text-sm">{formatMoney(renewal.price, $config.currency)}</span>
       </div>
-      <div class="border-l border-slate-200 dark:border-slate-800 pl-3">
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Cost</span>
+      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-3 rtl:pl-0 rtl:pr-3">
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_cost', $lang)}</span>
         <span class="text-slate-600 dark:text-slate-300 font-medium">{formatMoney(renewal.cost, $config.currency)}</span>
       </div>
-      <div class="border-l border-slate-200 dark:border-slate-800 pl-3">
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">Profit</span>
+      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-3 rtl:pl-0 rtl:pr-3">
+        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_profit', $lang)}</span>
         <span class="text-emerald-600 dark:text-emerald-400 font-semibold">+{formatMoney(profit, $config.currency)}</span>
       </div>
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex items-center space-x-1">
+    <div class="flex items-center space-x-1 rtl:space-x-reverse">
       <button
         on:click={() => { triggerHaptic(); onRenew(renewal); }}
-        title="Renew (+1 Year)"
+        title={t('card_renew', $lang)}
         class="touch-press px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold"
       >
-        Renew
+        {t('card_renew', $lang)}
       </button>
 
       <button
         on:click={() => { triggerHaptic(); onEdit(renewal); }}
-        title="Edit Renewal"
+        title={t('card_edit', $lang)}
         class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,7 +144,7 @@
 
       <button
         on:click={() => { triggerHaptic(); onDelete(renewal); }}
-        title="Delete Renewal"
+        title={t('card_delete', $lang)}
         class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-500 dark:hover:text-red-400 border border-slate-200 dark:border-slate-700/60"
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
