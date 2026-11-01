@@ -185,19 +185,6 @@
             {/each}
           </div>
         {/if}
-
-        <!-- Thumb Floating Action Button (FAB) for Instant Quick Add -->
-        <button
-          type="button"
-          on:click={openNewModal}
-          class="fixed bottom-20 right-4 rtl:right-auto rtl:left-4 z-30 touch-press w-13 h-13 rounded-2xl bg-sky-600 hover:bg-sky-500 active:scale-95 text-white shadow-lg shadow-sky-600/30 flex items-center justify-center transition-all group"
-          aria-label={t('header_add', $lang)}
-          title={t('header_add', $lang)}
-        >
-          <svg class="w-6 h-6 transition-transform group-hover:rotate-90 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
-          </svg>
-        </button>
       </div>
 
     {:else if $activeTab === 'quotes'}
