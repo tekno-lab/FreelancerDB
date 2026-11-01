@@ -18,15 +18,24 @@
   };
   $: profit = (Number(renewal.price) || 0) - (Number(renewal.cost) || 0);
 
+  // Dynamic urgency border & glow
+  $: borderUrgencyClass = daysLeft < 0
+    ? 'border-l-rose-500 rtl:border-l-0 rtl:border-r-rose-500 bg-rose-500/[0.02]'
+    : daysLeft <= 7
+    ? 'border-l-amber-500 rtl:border-l-0 rtl:border-r-amber-500 bg-amber-500/[0.02]'
+    : daysLeft <= 30
+    ? 'border-l-sky-500 rtl:border-l-0 rtl:border-r-sky-500'
+    : 'border-l-emerald-500/80 rtl:border-l-0 rtl:border-r-emerald-500/80';
+
   function getTypeStyle(type) {
     switch (type) {
       case 'Database':
-        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20';
+        return 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/25';
       case 'QR Code':
-        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/20';
+        return 'bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-500/25';
       case 'Website':
       default:
-        return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/20';
+        return 'bg-sky-500/10 text-sky-600 dark:text-sky-400 border-sky-500/25';
     }
   }
 
@@ -52,43 +61,48 @@
   }
 </script>
 
-<div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm transition-all relative overflow-hidden">
-  <!-- Top Row: Client & Status Countdown -->
-  <div class="flex items-start justify-between gap-2 mb-2">
-    <div>
+<div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-4 shadow-sm hover:shadow-md transition-all relative overflow-hidden border-l-4 rtl:border-l rtl:border-r-4 {borderUrgencyClass}">
+  <!-- Top Header Row: Client & Status Countdown -->
+  <div class="flex items-start justify-between gap-2.5 mb-2.5">
+    <div class="min-w-0 flex-1">
       <div class="flex items-center space-x-1.5 rtl:space-x-reverse">
-        <h3 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">{renewal.client}</h3>
+        <h3 class="text-base font-extrabold text-slate-900 dark:text-white tracking-tight truncate leading-tight">
+          {renewal.client}
+        </h3>
       </div>
-      <div class="text-xs text-sky-600 dark:text-sky-400 font-medium truncate max-w-[210px] mt-0.5">
-        {renewal.item}
+      <div class="text-xs text-sky-600 dark:text-sky-400 font-semibold truncate mt-1 flex items-center space-x-1 rtl:space-x-reverse">
+        <svg class="w-3.5 h-3.5 flex-shrink-0 text-sky-500 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+        </svg>
+        <span class="truncate">{renewal.item}</span>
       </div>
     </div>
 
     <!-- Urgency Badge -->
-    <div class="inline-flex items-center space-x-1.5 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-semibold border {urgency.badgeClass}">
-      <span class="w-1.5 h-1.5 rounded-full {urgency.dotClass}"></span>
-      <span>{urgency.label}</span>
+    <div class="flex-shrink-0 inline-flex items-center space-x-1.5 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs {urgency.badgeClass}">
+      <span class="w-1.5 h-1.5 rounded-full {urgency.dotClass} {daysLeft <= 7 ? 'animate-ping' : ''}"></span>
+      <span class="whitespace-nowrap">{urgency.label}</span>
     </div>
   </div>
 
-  <!-- Middle Row: Type & Expiry Info -->
+  <!-- Middle Row: Metadata Pills -->
   <div class="flex flex-wrap items-center gap-1.5 text-xs my-2.5">
     <!-- Type Badge -->
-    <span class="inline-flex items-center space-x-1 rtl:space-x-reverse px-2 py-0.5 rounded-md font-medium border {getTypeStyle(renewal.type)}">
+    <span class="inline-flex items-center space-x-1 rtl:space-x-reverse px-2.5 py-1 rounded-lg font-semibold border {getTypeStyle(renewal.type)}">
       <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={getTypeIcon(renewal.type)} />
       </svg>
       <span>{getTypeLabel(renewal.type)}</span>
     </span>
 
-    <!-- Cycle -->
-    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60">
+    <!-- Cycle Badge -->
+    <span class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 font-medium">
       {renewal.cycle || 'Annual'}
     </span>
 
     <!-- Expiry Date -->
-    <span class="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 flex items-center space-x-1 rtl:space-x-reverse">
-      <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <span class="px-2 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/60 flex items-center space-x-1 rtl:space-x-reverse font-medium">
+      <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
       <span>{formatDate(renewal.expiryDate)}</span>
@@ -96,56 +110,72 @@
 
     <!-- Calendar Sync Icon -->
     {#if renewal.calendarEventId}
-      <span class="px-1.5 py-0.5 rounded bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[10px] flex items-center space-x-1 rtl:space-x-reverse" title="Synced with Google Calendar (7d reminder)">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      <span class="px-2 py-1 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[11px] font-semibold flex items-center space-x-1 rtl:space-x-reverse" title="Synced with Google Calendar (7-day advance reminder)">
+        <svg class="w-3 h-3 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
         </svg>
         <span>{t('card_gcal_synced', $lang)}</span>
       </span>
     {/if}
   </div>
 
-  <!-- Financials Row -->
-  <div class="flex items-center justify-between pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
-    <div class="flex items-center space-x-3 rtl:space-x-reverse">
+  <!-- Financials & Quick Actions Row -->
+  <div class="flex items-center justify-between pt-3 mt-2.5 border-t border-slate-100 dark:border-slate-800/90 gap-2">
+    <!-- Financial Numbers -->
+    <div class="flex items-center space-x-3 rtl:space-x-reverse min-w-0">
       <div>
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_price', $lang)}</span>
-        <span class="font-bold text-slate-900 dark:text-white text-sm">{formatMoney(renewal.price, $config.currency)}</span>
+        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_price', $lang)}</span>
+        <span class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">{formatMoney(renewal.price, $config.currency)}</span>
       </div>
-      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-3 rtl:pl-0 rtl:pr-3">
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_cost', $lang)}</span>
-        <span class="text-slate-600 dark:text-slate-300 font-medium">{formatMoney(renewal.cost, $config.currency)}</span>
+
+      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2.5 rtl:pl-0 rtl:pr-2.5">
+        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_cost', $lang)}</span>
+        <span class="text-slate-600 dark:text-slate-400 font-semibold text-xs">{formatMoney(renewal.cost, $config.currency)}</span>
       </div>
-      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-3 rtl:pl-0 rtl:pr-3">
-        <span class="text-slate-500 dark:text-slate-400 block text-[10px]">{t('card_profit', $lang)}</span>
-        <span class="text-emerald-600 dark:text-emerald-400 font-semibold">+{formatMoney(profit, $config.currency)}</span>
+
+      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2.5 rtl:pl-0 rtl:pr-2.5">
+        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_profit', $lang)}</span>
+        <span class="text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 inline-block">
+          +{formatMoney(profit, $config.currency)}
+        </span>
       </div>
     </div>
 
-    <!-- Action Buttons -->
-    <div class="flex items-center space-x-1 rtl:space-x-reverse">
+    <!-- Thumb-Friendly Action Buttons (Min 40px touch height) -->
+    <div class="flex items-center space-x-1.5 rtl:space-x-reverse flex-shrink-0">
+      <!-- Quick Renew (+1y) Button -->
       <button
+        type="button"
         on:click={() => { triggerHaptic(); onRenew(renewal); }}
         title={t('card_renew', $lang)}
-        class="touch-press px-2.5 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold"
+        class="touch-press min-h-[40px] px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold shadow-sm shadow-emerald-500/20 flex items-center space-x-1 rtl:space-x-reverse transition-all"
       >
-        {t('card_renew', $lang)}
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+        <span>{t('card_renew', $lang)}</span>
       </button>
 
+      <!-- Edit Button -->
       <button
+        type="button"
         on:click={() => { triggerHaptic(); onEdit(renewal); }}
         title={t('card_edit', $lang)}
-        class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-700/60"
+        class="touch-press min-h-[40px] min-w-[40px] p-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700/70 active:scale-95 flex items-center justify-center transition-all"
+        aria-label={t('card_edit', $lang)}
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
         </svg>
       </button>
 
+      <!-- Delete Button -->
       <button
+        type="button"
         on:click={() => { triggerHaptic(); onDelete(renewal); }}
         title={t('card_delete', $lang)}
-        class="touch-press p-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-red-500 dark:hover:text-red-400 border border-slate-200 dark:border-slate-700/60"
+        class="touch-press min-h-[40px] min-w-[40px] p-2 rounded-xl bg-slate-100 hover:bg-rose-50 dark:bg-slate-800 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700/70 active:scale-95 flex items-center justify-center transition-all"
+        aria-label={t('card_delete', $lang)}
       >
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -154,9 +184,13 @@
     </div>
   </div>
 
+  <!-- Notes Callout (if available) -->
   {#if renewal.notes}
-    <div class="mt-2 text-[11px] text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/60 rounded-lg p-2 border border-slate-200 dark:border-slate-800/40 line-clamp-2">
-      {renewal.notes}
+    <div class="mt-2.5 text-[11px] text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/70 rounded-xl p-2.5 border border-slate-200/80 dark:border-slate-800/80 flex items-start space-x-1.5 rtl:space-x-reverse">
+      <svg class="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+      </svg>
+      <span class="line-clamp-2 leading-relaxed">{renewal.notes}</span>
     </div>
   {/if}
 </div>

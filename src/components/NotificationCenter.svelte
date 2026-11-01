@@ -4,6 +4,8 @@
   import { apiSaveRenewal } from '../lib/api.js';
   import { daysUntil, formatDate, formatMoney, getUrgency, triggerHaptic } from '../lib/utils.js';
 
+  let selectedAlertTab = 'All';
+
   $: itemsWithUrgency = ($renewals || [])
     .map(r => {
       const daysLeft = daysUntil(r.expiryDate);
@@ -26,6 +28,16 @@
   $: dueWithin7 = itemsWithUrgency.filter(i => i.daysLeft >= 0 && i.daysLeft <= 7);
   $: dueWithin14 = itemsWithUrgency.filter(i => i.daysLeft > 7 && i.daysLeft <= 14);
   $: dueWithin30 = itemsWithUrgency.filter(i => i.daysLeft > 14 && i.daysLeft <= 30);
+
+  $: displayedItems = selectedAlertTab === 'Expired'
+    ? expired
+    : selectedAlertTab === '7d'
+    ? dueWithin7
+    : selectedAlertTab === '14d'
+    ? dueWithin14
+    : selectedAlertTab === '30d'
+    ? dueWithin30
+    : itemsWithUrgency;
 
   async function quickRenew(item) {
     triggerHaptic();
@@ -54,130 +66,136 @@
   }
 </script>
 
-<div class="space-y-4 pb-nav">
-  <div>
-    <h2 class="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{t('alerts_title', $lang)}</h2>
-    <p class="text-xs text-slate-500 dark:text-slate-400">{t('alerts_subtitle', $lang)}</p>
+<div class="space-y-4 pb-24">
+  <!-- Heading & Overview Summary -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-lg font-black text-slate-900 dark:text-white tracking-tight">{t('alerts_title', $lang)}</h2>
+      <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('alerts_subtitle', $lang)}</p>
+    </div>
+    {#if itemsWithUrgency.length > 0}
+      <span class="text-xs font-black px-2.5 py-1 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+        {itemsWithUrgency.length} {$lang === 'ku' ? 'ئاگاداری' : 'Alerts'}
+      </span>
+    {/if}
   </div>
 
   {#if itemsWithUrgency.length === 0}
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center shadow-sm">
-      <div class="w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-500 mx-auto flex items-center justify-center mb-2">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    <!-- All Clear Empty State -->
+    <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-3xl p-8 text-center shadow-sm">
+      <div class="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-500 mx-auto flex items-center justify-center mb-3.5">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
         </svg>
       </div>
       <h3 class="text-sm font-bold text-slate-900 dark:text-white">{t('alerts_empty_title', $lang)}</h3>
-      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('alerts_empty_desc', $lang)}</p>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto leading-relaxed">{t('alerts_empty_desc', $lang)}</p>
     </div>
   {:else}
-    <!-- Expired Section -->
-    {#if expired.length > 0}
-      <div class="space-y-2">
-        <div class="flex items-center space-x-2 rtl:space-x-reverse text-xs font-bold text-red-500 uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
-          <span>{t('alerts_expired', $lang)} ({expired.length})</span>
-        </div>
-        {#each expired as item}
-          <div class="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-500/30 rounded-2xl p-3.5 space-y-2 shadow-sm">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold text-slate-900 dark:text-white">{item.client}</span>
-                <div class="text-[11px] text-red-600 dark:text-red-300">{item.item} ({item.type})</div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-red-500/10 dark:bg-red-500/20 text-red-600 dark:text-red-300 border border-red-500/30">
-                {item.urgency.label}
-              </span>
-            </div>
-            <div class="flex items-center justify-between text-xs pt-1 border-t border-red-200 dark:border-red-900/40">
-              <span class="text-slate-700 dark:text-slate-300 font-semibold">{formatMoney(item.price, $config.currency)}</span>
-              <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <button on:click={() => shareReminder(item)} class="text-[11px] px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700">{t('alerts_share', $lang)}</button>
-                <button on:click={() => quickRenew(item)} class="text-[11px] px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold">{t('alerts_renew1yr', $lang)}</button>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
+    <!-- Category Filter Chips -->
+    <div class="flex items-center space-x-1.5 rtl:space-x-reverse overflow-x-auto pb-1 text-xs scrollbar-none">
+      <button
+        type="button"
+        on:click={() => { triggerHaptic(); selectedAlertTab = 'All'; }}
+        class="touch-press px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap {selectedAlertTab === 'All' ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-sm' : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-800'}"
+      >
+        {$lang === 'ku' ? 'هەموو' : 'All'} ({itemsWithUrgency.length})
+      </button>
 
-    <!-- Critical Section: < 7 Days -->
-    {#if dueWithin7.length > 0}
-      <div class="space-y-2">
-        <div class="flex items-center space-x-2 rtl:space-x-reverse text-xs font-bold text-rose-500 uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-rose-500"></span>
-          <span>{t('alerts_due7', $lang)} ({dueWithin7.length})</span>
-        </div>
-        {#each dueWithin7 as item}
-          <div class="bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-500/30 rounded-2xl p-3.5 space-y-2 shadow-sm">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold text-slate-900 dark:text-white">{item.client}</span>
-                <div class="text-[11px] text-rose-600 dark:text-rose-300">{item.item} ({item.type})</div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/30">
-                {item.urgency.label}
-              </span>
-            </div>
-            <div class="flex items-center justify-between text-xs pt-1 border-t border-rose-200 dark:border-rose-900/40">
-              <span class="text-slate-700 dark:text-slate-300 font-semibold">{formatMoney(item.price, $config.currency)}</span>
-              <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <button on:click={() => shareReminder(item)} class="text-[11px] px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700">{t('alerts_share', $lang)}</button>
-                <button on:click={() => quickRenew(item)} class="text-[11px] px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold">{t('alerts_renew1yr', $lang)}</button>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
+      {#if expired.length > 0}
+        <button
+          type="button"
+          on:click={() => { triggerHaptic(); selectedAlertTab = 'Expired'; }}
+          class="touch-press px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap {selectedAlertTab === 'Expired' ? 'bg-rose-600 text-white shadow-sm' : 'bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/40'}"
+        >
+          {t('alerts_expired', $lang)} ({expired.length})
+        </button>
+      {/if}
 
-    <!-- Upcoming Section: 8 - 14 Days -->
-    {#if dueWithin14.length > 0}
-      <div class="space-y-2">
-        <div class="flex items-center space-x-2 rtl:space-x-reverse text-xs font-bold text-amber-500 uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-          <span>{t('alerts_due14', $lang)} ({dueWithin14.length})</span>
-        </div>
-        {#each dueWithin14 as item}
-          <div class="bg-amber-50 dark:bg-slate-900 border border-amber-200 dark:border-amber-500/30 rounded-2xl p-3.5 space-y-2 shadow-sm">
-            <div class="flex items-start justify-between">
-              <div>
-                <span class="text-xs font-bold text-slate-900 dark:text-white">{item.client}</span>
-                <div class="text-[11px] text-slate-600 dark:text-slate-400">{item.item} ({item.type})</div>
-              </div>
-              <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30">
-                {item.urgency.label}
-              </span>
-            </div>
-            <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-200 dark:border-slate-800">
-              <span class="text-slate-700 dark:text-slate-300 font-semibold">{formatMoney(item.price, $config.currency)}</span>
-              <div class="flex items-center space-x-2 rtl:space-x-reverse">
-                <button on:click={() => shareReminder(item)} class="text-[11px] px-2.5 py-1 rounded bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700">{t('alerts_share', $lang)}</button>
-                <button on:click={() => quickRenew(item)} class="text-[11px] px-2.5 py-1 rounded bg-emerald-600 text-white font-semibold">{t('alerts_renew1yr', $lang)}</button>
-              </div>
-            </div>
-          </div>
-        {/each}
-      </div>
-    {/if}
+      {#if dueWithin7.length > 0}
+        <button
+          type="button"
+          on:click={() => { triggerHaptic(); selectedAlertTab = '7d'; }}
+          class="touch-press px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap {selectedAlertTab === '7d' ? 'bg-amber-600 text-white shadow-sm' : 'bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/40'}"
+        >
+          ≤ 7d ({dueWithin7.length})
+        </button>
+      {/if}
 
-    <!-- Upcoming Section: 15 - 30 Days -->
-    {#if dueWithin30.length > 0}
-      <div class="space-y-2">
-        <div class="flex items-center space-x-2 rtl:space-x-reverse text-xs font-bold text-yellow-600 dark:text-yellow-400 uppercase tracking-wider">
-          <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
-          <span>{t('alerts_due30', $lang)} ({dueWithin30.length})</span>
-        </div>
-        {#each dueWithin30 as item}
-          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 flex items-center justify-between shadow-sm">
-            <div>
-              <div class="text-xs font-bold text-slate-900 dark:text-white">{item.client}</div>
-              <div class="text-[11px] text-slate-500 dark:text-slate-400">{item.item} • {formatDate(item.expiryDate)}</div>
+      {#if dueWithin14.length > 0}
+        <button
+          type="button"
+          on:click={() => { triggerHaptic(); selectedAlertTab = '14d'; }}
+          class="touch-press px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap {selectedAlertTab === '14d' ? 'bg-sky-600 text-white shadow-sm' : 'bg-sky-50 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-900/40'}"
+        >
+          ≤ 14d ({dueWithin14.length})
+        </button>
+      {/if}
+
+      {#if dueWithin30.length > 0}
+        <button
+          type="button"
+          on:click={() => { triggerHaptic(); selectedAlertTab = '30d'; }}
+          class="touch-press px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap {selectedAlertTab === '30d' ? 'bg-slate-700 text-white shadow-sm' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700'}"
+        >
+          ≤ 30d ({dueWithin30.length})
+        </button>
+      {/if}
+    </div>
+
+    <!-- Alert Cards List -->
+    <div class="space-y-3">
+      {#each displayedItems as item (item.id)}
+        <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 rounded-2xl p-4 shadow-sm hover:shadow transition-all border-l-4 rtl:border-l rtl:border-r-4 {item.daysLeft < 0 ? 'border-l-rose-500 rtl:border-r-rose-500 bg-rose-500/[0.02]' : item.daysLeft <= 7 ? 'border-l-amber-500 rtl:border-r-amber-500 bg-amber-500/[0.02]' : 'border-l-sky-500 rtl:border-r-sky-500'}">
+          <!-- Card Header -->
+          <div class="flex items-start justify-between gap-2 mb-2">
+            <div class="min-w-0 flex-1">
+              <h3 class="text-sm font-extrabold text-slate-900 dark:text-white truncate">{item.client}</h3>
+              <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 truncate mt-0.5">{item.item} • {item.type}</p>
             </div>
-            <span class="text-xs font-semibold text-yellow-600 dark:text-yellow-300">{item.daysLeft}d left</span>
+            <span class="inline-flex items-center space-x-1 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-bold border {item.urgency.badgeClass} flex-shrink-0">
+              <span class="w-1.5 h-1.5 rounded-full {item.urgency.dotClass} {item.daysLeft <= 7 ? 'animate-ping' : ''}"></span>
+              <span>{item.urgency.label}</span>
+            </span>
           </div>
-        {/each}
-      </div>
-    {/if}
+
+          <!-- Date & Pricing -->
+          <div class="flex items-center justify-between text-xs py-2 border-t border-slate-100 dark:border-slate-800/80">
+            <div class="text-slate-600 dark:text-slate-400 font-medium flex items-center space-x-1.5 rtl:space-x-reverse">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{formatDate(item.expiryDate)}</span>
+            </div>
+            <span class="font-black text-slate-900 dark:text-white text-sm">{formatMoney(item.price, $config.currency)}</span>
+          </div>
+
+          <!-- Quick Thumb Actions -->
+          <div class="flex items-center justify-end space-x-2 rtl:space-x-reverse pt-2 border-t border-slate-100 dark:border-slate-800/80">
+            <button
+              type="button"
+              on:click={() => shareReminder(item)}
+              class="touch-press min-h-[38px] px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center space-x-1.5 rtl:space-x-reverse transition-colors"
+            >
+              <svg class="w-3.5 h-3.5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+              <span>{t('alerts_share', $lang)}</span>
+            </button>
+
+            <button
+              type="button"
+              on:click={() => quickRenew(item)}
+              class="touch-press min-h-[38px] px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm shadow-emerald-600/20 flex items-center space-x-1.5 rtl:space-x-reverse transition-colors active:scale-95"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span>{t('alerts_renew1yr', $lang)}</span>
+            </button>
+          </div>
+        </div>
+      {/each}
+    </div>
   {/if}
 </div>
