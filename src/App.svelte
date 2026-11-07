@@ -41,6 +41,8 @@
 
     // Category / Status Filter
     if (selectedFilter === 'All') return true;
+    if (selectedFilter === 'Active') return r.status !== 'Inactive';
+    if (selectedFilter === 'Inactive') return r.status === 'Inactive';
     if (selectedFilter === 'Due Soon') {
       const d = daysUntil(r.expiryDate);
       return d <= 14 && r.status !== 'Renewed' && r.status !== 'Inactive';
@@ -78,6 +80,15 @@
       ...r,
       expiryDate: curDate.toISOString().slice(0, 10),
       status: 'Renewed'
+    };
+    await apiSaveRenewal(updated, true);
+  }
+
+  async function handleToggleStatus(r) {
+    const newStatus = r.status === 'Inactive' ? 'Active' : 'Inactive';
+    const updated = {
+      ...r,
+      status: newStatus
     };
     await apiSaveRenewal(updated, true);
   }
@@ -148,6 +159,8 @@
         <div class="flex items-center space-x-1.5 rtl:space-x-reverse overflow-x-auto pb-1 text-xs scrollbar-none">
           {#each [
             { id: 'All', label: t('filter_all', $lang) },
+            { id: 'Active', label: t('filter_active', $lang) },
+            { id: 'Inactive', label: t('filter_inactive', $lang) },
             { id: 'Website', label: t('filter_website', $lang) },
             { id: 'Database', label: t('filter_database', $lang) },
             { id: 'QR Code', label: t('filter_qrcode', $lang) },
@@ -182,6 +195,7 @@
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 onRenew={handleRenew}
+                onToggleStatus={handleToggleStatus}
               />
             {/each}
           </div>

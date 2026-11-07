@@ -7,7 +7,9 @@
   export let onEdit = () => {};
   export let onDelete = () => {};
   export let onRenew = () => {};
+  export let onToggleStatus = () => {};
 
+  $: isInactive = renewal.status === 'Inactive';
   $: daysLeft = daysUntil(renewal.expiryDate);
   $: rawUrgency = getUrgency(daysLeft);
   $: urgency = {
@@ -20,7 +22,9 @@
   $: profit = (Number(renewal.price) || 0) - (Number(renewal.cost) || 0) - commission;
 
   // Dynamic urgency border & glow
-  $: borderUrgencyClass = daysLeft < 0
+  $: borderUrgencyClass = isInactive
+    ? 'border-l-slate-400 dark:border-l-slate-600 rtl:border-l-0 rtl:border-r-slate-400 opacity-75'
+    : daysLeft < 0
     ? 'border-l-rose-500 rtl:border-l-0 rtl:border-r-rose-500 bg-rose-500/[0.02]'
     : daysLeft <= 7
     ? 'border-l-amber-500 rtl:border-l-0 rtl:border-r-amber-500 bg-amber-500/[0.02]'
@@ -79,10 +83,25 @@
       </div>
     </div>
 
-    <!-- Urgency Badge -->
-    <div class="flex-shrink-0 inline-flex items-center space-x-1.5 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs {urgency.badgeClass}">
-      <span class="w-1.5 h-1.5 rounded-full {urgency.dotClass} {daysLeft <= 7 ? 'animate-ping' : ''}"></span>
-      <span class="whitespace-nowrap">{urgency.label}</span>
+    <!-- Status & Urgency Badges -->
+    <div class="flex-shrink-0 flex items-center space-x-1.5 rtl:space-x-reverse">
+      <!-- 1-Tap Active / Inactive Toggle -->
+      <button
+        type="button"
+        on:click|stopPropagation={() => { triggerHaptic(); onToggleStatus(renewal); }}
+        class="touch-press inline-flex items-center space-x-1 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-bold border transition-all {isInactive ? 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-300 dark:border-slate-700 hover:bg-emerald-50 hover:text-emerald-700' : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-700/60 hover:bg-rose-50 hover:text-rose-700'}"
+        title="Click to toggle Active / Inactive"
+      >
+        <span class="w-1.5 h-1.5 rounded-full {isInactive ? 'bg-slate-400' : 'bg-emerald-500'}"></span>
+        <span>{isInactive ? t('card_status_inactive', $lang) : t('card_status_active', $lang)}</span>
+      </button>
+
+      {#if !isInactive}
+        <div class="inline-flex items-center space-x-1.5 rtl:space-x-reverse px-2.5 py-1 rounded-full text-xs font-bold border shadow-xs {urgency.badgeClass}">
+          <span class="w-1.5 h-1.5 rounded-full {urgency.dotClass} {daysLeft <= 7 ? 'animate-ping' : ''}"></span>
+          <span class="whitespace-nowrap">{urgency.label}</span>
+        </div>
+      {/if}
     </div>
   </div>
 

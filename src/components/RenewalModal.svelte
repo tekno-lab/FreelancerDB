@@ -12,6 +12,7 @@
   let type = item?.type || 'Website';
   let expiryDate = item?.expiryDate || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
   let cycle = item?.cycle || 'Annual';
+  let status = item?.status === 'Inactive' ? 'Inactive' : 'Active';
   let cost = item?.cost ?? 0;
   let price = item?.price ?? 150;
   let commission = item?.commission ?? 0;
@@ -46,6 +47,7 @@
       client: client.trim(),
       item: itemName.trim(),
       type,
+      status,
       expiryDate,
       cycle,
       cost: Number(cost) || 0,
@@ -96,6 +98,29 @@
         {#if type === 'Database'}
           <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-1.5">{t('modal_class_db_note', $lang)}</p>
         {/if}
+      </div>
+
+      <!-- Customer Status (Active / Inactive) -->
+      <div>
+        <span class="block text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-2">{t('modal_status', $lang)}</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            on:click={() => { triggerHaptic(); status = 'Active'; }}
+            class="touch-press py-2.5 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center space-x-1.5 rtl:space-x-reverse transition-all {status !== 'Inactive' ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'}"
+          >
+            <span class="w-2 h-2 rounded-full {status !== 'Inactive' ? 'bg-white' : 'bg-emerald-500'}"></span>
+            <span>{t('card_status_active', $lang)}</span>
+          </button>
+          <button
+            type="button"
+            on:click={() => { triggerHaptic(); status = 'Inactive'; }}
+            class="touch-press py-2.5 px-3 rounded-2xl border text-xs font-bold flex items-center justify-center space-x-1.5 rtl:space-x-reverse transition-all {status === 'Inactive' ? 'bg-rose-600 text-white border-rose-600 shadow-md shadow-rose-600/20' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'}"
+          >
+            <span class="w-2 h-2 rounded-full {status === 'Inactive' ? 'bg-white' : 'bg-rose-500'}"></span>
+            <span>{t('card_status_inactive', $lang)}</span>
+          </button>
+        </div>
       </div>
 
       <!-- Client Name -->
