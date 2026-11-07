@@ -14,6 +14,8 @@
   let cycle = item?.cycle || 'Annual';
   let cost = item?.cost ?? 0;
   let price = item?.price ?? 150;
+  let commission = item?.commission ?? 0;
+  let link = item?.link || '';
   let provider = item?.provider || '';
   let notes = item?.notes || '';
   let syncCalendar = true;
@@ -48,6 +50,8 @@
       cycle,
       cost: Number(cost) || 0,
       price: Number(price) || 0,
+      commission: Number(commission) || 0,
+      link: link.trim(),
       provider: provider.trim(),
       notes: notes.trim(),
       calendarEventId: item?.calendarEventId || ''
@@ -147,6 +151,8 @@
             class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-medium"
           >
             <option value="Annual">{$lang === 'ku' ? 'ساڵانە' : 'Annual'}</option>
+            <option value="2 Years">{$lang === 'ku' ? 'دوو ساڵانە' : '2 Years'}</option>
+            <option value="3 Years">{$lang === 'ku' ? 'سێ ساڵانە' : '3 Years'}</option>
             <option value="Monthly">{$lang === 'ku' ? 'مانگانە' : 'Monthly'}</option>
             <option value="Quarterly">{$lang === 'ku' ? 'سێ مانگانە' : 'Quarterly'}</option>
             <option value="One-time">{$lang === 'ku' ? 'یەکجار' : 'One-time'}</option>
@@ -165,8 +171,21 @@
         </div>
       </div>
 
-      <!-- Price & Cost -->
-      <div class="grid grid-cols-2 gap-3">
+      <!-- Live Link / URL -->
+      <div>
+        <label for="modal-link-input" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{t('modal_link', $lang)}</label>
+        <input
+          id="modal-link-input"
+          type="url"
+          bind:value={link}
+          placeholder="e.g. https://myqrcode.site/client/ or https://domain.com"
+          class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-mono"
+          dir="ltr"
+        />
+      </div>
+
+      <!-- Price, Cost & Commission -->
+      <div class="grid grid-cols-3 gap-2.5">
         <div>
           <label for="modal-price-input" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{t('modal_price', $lang)} ({$config.currency})</label>
           <input
@@ -174,7 +193,7 @@
             type="number"
             step="any"
             bind:value={price}
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-bold"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-bold"
           />
         </div>
 
@@ -185,7 +204,18 @@
             type="number"
             step="any"
             bind:value={cost}
-            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-medium"
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-medium"
+          />
+        </div>
+
+        <div>
+          <label for="modal-commission-input" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">{t('modal_commission', $lang)}</label>
+          <input
+            id="modal-commission-input"
+            type="number"
+            step="any"
+            bind:value={commission}
+            class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 text-xs sm:text-sm font-medium"
           />
         </div>
       </div>

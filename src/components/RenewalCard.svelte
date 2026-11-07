@@ -16,7 +16,8 @@
       ? (daysLeft < 0 ? `${Math.abs(daysLeft)} ڕۆژ بەسەرچووە` : daysLeft === 0 ? 'ئەمڕۆ بەسەردەچێت!' : `${daysLeft} ڕۆژی ماوە`)
       : rawUrgency.label
   };
-  $: profit = (Number(renewal.price) || 0) - (Number(renewal.cost) || 0);
+  $: commission = Number(renewal.commission) || 0;
+  $: profit = (Number(renewal.price) || 0) - (Number(renewal.cost) || 0) - commission;
 
   // Dynamic urgency border & glow
   $: borderUrgencyClass = daysLeft < 0
@@ -117,23 +118,48 @@
         <span>{t('card_gcal_synced', $lang)}</span>
       </span>
     {/if}
+
+    <!-- Clickable Live Link -->
+    {#if renewal.link}
+      <a
+        href={renewal.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="touch-press px-2 py-1 rounded-lg bg-sky-50 hover:bg-sky-100 dark:bg-sky-950/60 dark:hover:bg-sky-900/60 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/40 text-[11px] font-semibold flex items-center space-x-1 rtl:space-x-reverse transition-colors"
+        title={renewal.link}
+      >
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+        </svg>
+        <span>{t('card_open_link', $lang)}</span>
+      </a>
+    {/if}
   </div>
 
   <!-- Financials & Quick Actions Row -->
   <div class="flex items-center justify-between pt-3 mt-2.5 border-t border-slate-100 dark:border-slate-800/90 gap-2">
     <!-- Financial Numbers -->
-    <div class="flex items-center space-x-3 rtl:space-x-reverse min-w-0">
+    <div class="flex items-center space-x-2.5 rtl:space-x-reverse min-w-0">
       <div>
         <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_price', $lang)}</span>
         <span class="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">{formatMoney(renewal.price, $config.currency)}</span>
       </div>
 
-      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2.5 rtl:pl-0 rtl:pr-2.5">
-        <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_cost', $lang)}</span>
-        <span class="text-slate-600 dark:text-slate-400 font-semibold text-xs">{formatMoney(renewal.cost, $config.currency)}</span>
-      </div>
+      {#if Number(renewal.cost) > 0}
+        <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2 rtl:pl-0 rtl:pr-2">
+          <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_cost', $lang)}</span>
+          <span class="text-slate-600 dark:text-slate-400 font-semibold text-xs">{formatMoney(renewal.cost, $config.currency)}</span>
+        </div>
+      {/if}
 
-      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2.5 rtl:pl-0 rtl:pr-2.5">
+      {#if commission > 0}
+        <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2 rtl:pl-0 rtl:pr-2">
+          <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_commission', $lang)}</span>
+          <span class="text-amber-600 dark:text-amber-400 font-semibold text-xs">-{formatMoney(commission, $config.currency)}</span>
+        </div>
+      {/if}
+
+      <div class="border-l rtl:border-l-0 rtl:border-r border-slate-200 dark:border-slate-800 pl-2 rtl:pl-0 rtl:pr-2">
         <span class="text-slate-400 dark:text-slate-500 block text-[10px] font-medium uppercase tracking-wider">{t('card_profit', $lang)}</span>
         <span class="text-emerald-600 dark:text-emerald-400 font-bold text-xs bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20 inline-block">
           +{formatMoney(profit, $config.currency)}

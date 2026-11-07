@@ -34,7 +34,8 @@
     const matchSearch = !q ||
       r.client?.toLowerCase().includes(q) ||
       r.item?.toLowerCase().includes(q) ||
-      r.type?.toLowerCase().includes(q);
+      r.type?.toLowerCase().includes(q) ||
+      r.notes?.toLowerCase().includes(q);
 
     if (!matchSearch) return false;
 
@@ -42,15 +43,15 @@
     if (selectedFilter === 'All') return true;
     if (selectedFilter === 'Due Soon') {
       const d = daysUntil(r.expiryDate);
-      return d <= 14 && r.status !== 'Renewed';
+      return d <= 14 && r.status !== 'Renewed' && r.status !== 'Inactive';
     }
     return r.type === selectedFilter;
   });
 
   // Summary Metrics
-  $: totalActive = ($renewals || []).filter(r => r.status !== 'Expired').length;
-  $: totalRevenue = ($renewals || []).reduce((sum, r) => sum + (Number(r.price) || 0), 0);
-  $: totalDueSoon = ($renewals || []).filter(r => daysUntil(r.expiryDate) <= 14 && r.status !== 'Renewed').length;
+  $: totalActive = ($renewals || []).filter(r => r.status !== 'Expired' && r.status !== 'Inactive').length;
+  $: totalRevenue = ($renewals || []).filter(r => r.status !== 'Inactive').reduce((sum, r) => sum + (Number(r.price) || 0), 0);
+  $: totalDueSoon = ($renewals || []).filter(r => daysUntil(r.expiryDate) <= 14 && r.status !== 'Renewed' && r.status !== 'Inactive').length;
 
   function openNewModal() {
     triggerHaptic();
